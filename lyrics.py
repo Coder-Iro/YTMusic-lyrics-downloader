@@ -11,8 +11,7 @@ for lyric in lyrics:
     lyri.append((lyric.text,ms))
     lyr.append(lyric.text)
 fil = ID3(sys.argv[1])
-tag = USLT(encoding=3, lang='kor', text="\n".join(lyr)) # this is unsynced lyrics
-#tag = SLT(encoding=3, lang='kor', format=2, type=1, text=lyri) --- not working
+tag = SLT(encoding=3, lang='kor', format=2, type=1, text=lyri)
 print(tag)
 fil.add(tag)
 fil.save(v1=0)

@@ -6,6 +6,11 @@ import youtube_dl
 import json
 from subprocess import Popen
 
+musicname = ''
+lyricsname = ''
+thumbsname = ''
+metaname = ''
+
 def hoook(d):
     global musicname
     global lyricsname
@@ -42,19 +47,17 @@ ydl_opts = {
 ydl = youtube_dl.YoutubeDL(ydl_opts)
 
 def download(url):
-    musicname = ''
-    lyricsname = ''
-    thumbsname = ''
-    metaname = ''
     ydl.download([url])
-    lyrics = webvtt.read(lyricsname)
-    lyri = [('',0)]
-    for lyric in lyrics:
-        lyri.append((lyric.text,conv_to_ms(lyric.start)))
-        lyri.append(("",conv_to_ms(lyric.end)))
     fil = ID3(musicname)
-    tag = SLT(encoding=3, lang='kor', format=2, type=1, text=lyri)
-    fil.add(tag)
+    if os.path.isfile(lyricsname):
+        lyrics = webvtt.read(lyricsname)
+        lyri = [('',0)]
+        for lyric in lyrics:
+            lyri.append((lyric.text,conv_to_ms(lyric.start)))
+            lyri.append(("",conv_to_ms(lyric.end)))
+        tag = SLT(encoding=3, lang='kor', format=2, type=1, text=lyri)
+        fil.add(tag)
+        Popen(f'ffmpeg -i "{lyricsname}" "{lyricsname.replace(".vtt",".lrc")}"',shell=True).wait()
     fil.add(APIC(encoding=3, mime='image/jpeg', data=open(thumbsname,"rb").read()))
     with open(metaname, 'r') as f:
         meta = json.load(f)
@@ -62,7 +65,6 @@ def download(url):
     fil.add(TIT3(encoding=3, text=meta["description"]))
     fil.add(TPE1(encoding=3, text=meta["uploader"]))
     fil.save(v1=0)
-    Popen(f'ffmpeg -i "{lyricsname}" "{lyricsname.replace(".vtt",".lrc")}"',shell=True).wait()
     os.remove(thumbsname)
     os.remove(lyricsname)
     os.remove(metaname)
@@ -70,4 +72,5 @@ def download(url):
 
 if __name__ == "__main__":
     import sys
+    os.chdir("dl")
     download(sys.argv[1])

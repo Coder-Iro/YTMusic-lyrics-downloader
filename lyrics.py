@@ -1,10 +1,11 @@
 #!/usr/bin/env python3.8
-from mutagen.id3 import ID3, SLT, APIC, TIT2, TPE1, TIT3
+import json
 import os
+from subprocess import Popen
+
 import webvtt
 import youtube_dl
-import json
-from subprocess import Popen
+from mutagen.id3 import ID3, SLT, APIC, TIT2, TPE1, TIT3
 
 musicname = ''
 lyricsname = ''
@@ -57,7 +58,7 @@ def download(url):
             lyri.append(("",conv_to_ms(lyric.end)))
         tag = SLT(encoding=3, lang='kor', format=2, type=1, text=lyri)
         fil.add(tag)
-        Popen(f'ffmpeg -i "{lyricsname}" "{lyricsname.replace(".vtt",".lrc")}"',shell=True).wait()
+        Popen(f'ffmpeg.exe -i "{lyricsname}" "{lyricsname.replace(".vtt", ".lrc")}"', shell=True).wait()
     fil.add(APIC(encoding=3, mime='image/jpeg', data=open(thumbsname,"rb").read()))
     with open(metaname, 'r') as f:
         meta = json.load(f)

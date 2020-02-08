@@ -58,7 +58,7 @@ def download(url):
             lyri.append(("",conv_to_ms(lyric.end)))
         tag = SLT(encoding=3, lang='kor', format=2, type=1, text=lyri)
         fil.add(tag)
-        Popen(f'ffmpeg.exe -i "{lyricsname}" "{lyricsname.replace(".vtt", ".lrc")}"', shell=True).wait()
+        Popen(f'ffmpeg -i "{lyricsname}" "{lyricsname.replace(".vtt", ".lrc")}"', shell=True).wait()
     fil.add(APIC(encoding=3, mime='image/jpeg', data=open(thumbsname,"rb").read()))
     with open(metaname, 'r') as f:
         meta = json.load(f)
@@ -67,11 +67,11 @@ def download(url):
     fil.add(TPE1(encoding=3, text=meta["uploader"]))
     fil.save(v1=0)
     os.remove(thumbsname)
-    os.remove(lyricsname)
+    if os.path.isfile(lyricsname):
+        os.remove(lyricsname)
     os.remove(metaname)
     return musicname
 
 if __name__ == "__main__":
     import sys
-    os.chdir("dl")
     download(sys.argv[1])

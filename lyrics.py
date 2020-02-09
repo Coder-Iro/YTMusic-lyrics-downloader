@@ -58,6 +58,8 @@ def download(url):
             lyri.append(("",conv_to_ms(lyric.end)))
         tag = SLT(encoding=3, lang='kor', format=2, type=1, text=lyri)
         fil.add(tag)
+        if os.path.isfile(name:= lyricsname.replace(".vtt", ".lrc")):
+            os.remove(name)
         Popen(f'ffmpeg -i "{lyricsname}" "{lyricsname.replace(".vtt", ".lrc")}"', shell=True).wait()
     fil.add(APIC(encoding=3, mime='image/jpeg', data=open(thumbsname,"rb").read()))
     with open(metaname, 'r') as f:
